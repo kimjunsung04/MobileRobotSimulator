@@ -8,16 +8,12 @@ public class RobotMove : MonoBehaviour
 {
     float[] org_pos = new float[3] { 0, 0, 0 };
     float[] distance = new float[3] { 0, 0, 0 };
-    float start_deg;
 
-    public string SourceCodeStr;
+    public string SourceCodeStr; // 소스코드 문자열로
 
-    float distanceforward;
-    float distanceright;
-
-    bool reck = false;
-    bool step_end = false;
-    Vector3 target; // TD 타겟 선언
+    bool reck = false; // 리셋체크
+    bool step_end = false; // 스텝 끝났는지 체크
+    private JObject SourceCode;
 
     //void Start()
     //{
@@ -48,8 +44,7 @@ public class RobotMove : MonoBehaviour
 
     public IEnumerator caserunner(int csenum) // 케이스 코루틴 실행함수
     {
-        //JObject SourceCode = JObject.Parse(SourceCodeStr);
-        //Debug.Log(SourceCode["source"]);
+        //SourceCode = JObject.Parse(SourceCodeStr);
         yield return StartCoroutine(caserun(csenum));
     }
 
@@ -61,7 +56,7 @@ public class RobotMove : MonoBehaviour
                 while (true)
                 {
                     yield return StartCoroutine(StepHandler("H", 300, 0, 0));
-                    if (distanceforward > 500)
+                    if (distance[0] > 300)
                     {
                         break;
                     }
@@ -71,7 +66,7 @@ public class RobotMove : MonoBehaviour
                 while (true)
                 {
                     yield return StartCoroutine(StepHandler("H", 300, -300, 0));
-                    if (distanceforward > 500)
+                    if (distance[0] > 500)
                     {
                         break;
                     }
@@ -97,62 +92,12 @@ public class RobotMove : MonoBehaviour
 
         transform.Translate((transform.forward * 1) * Time.deltaTime * vx, Space.World);
         transform.Translate((transform.right * 1) * Time.deltaTime * vy, Space.World);
-        transform.Rotate((transform.up * 1000) * Time.deltaTime * vw, Space.World);
 
         /* distance */
-        distanceforward += ((transform.forward * 1) * Time.deltaTime * vx).magnitude * 1000;
-        distanceright += ((transform.right * 1) * Time.deltaTime * vy).magnitude * 1000;
+        distance[0] += ((transform.forward * 1) * Time.deltaTime * vx).magnitude * 1000;
+        distance[1] += ((transform.right * 1) * Time.deltaTime * vy).magnitude * 1000;
 
         yield return 0;
-    }
-
-    private IEnumerator TD(float xpos, float ypos, float deg, float fw_spd)
-    {
-        /* xy만 구현된 TD */
-        /*
-        
-        start_deg = transform.localEulerAngles.y;
-        IEnumerator start = TD(800, 200,0, 0.5f);
-        yield return StartCoroutine(start);
-        IEnumerator start1 = TD(200, 300, 0, 0.5f);
-        yield return StartCoroutine(start1);
-
-         */
-        startset();
-        xpos = xpos / 1000; // xpos 유니티 좌표값 보정
-        ypos = ypos / 1000; // ypos 유니티 좌표값 보정
-        fw_spd = fw_spd / 1000;
-        if (start_deg == 0)
-        {
-            target = new Vector3(transform.position.x + ypos, transform.position.y, transform.position.z + xpos);
-        }
-        else if (start_deg == 90)
-        {
-            ypos -= (ypos * 2); // ypos 좌우변경처리(+-변경)
-            target = new Vector3(transform.position.x + xpos, transform.position.y, transform.position.z + ypos);
-        }
-        else if (start_deg == 180)
-        {
-            ypos -= (ypos * 2); // ypos 좌우변경처리(+-변경)
-            xpos -= (xpos * 2); // xpos 후진처리(+-변경)
-            target = new Vector3(transform.position.x + ypos, transform.position.y, transform.position.z + xpos);
-        }
-        else if (start_deg == 270)
-        {
-            xpos -= (xpos * 2); // xpos 후진처리(+-변경)
-            target = new Vector3(transform.position.x + xpos, transform.position.y, transform.position.z + ypos);
-        }
-        float t = 0;
-        while (t <= 1)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, target, fw_spd * Time.deltaTime); // x y 처리
-            t += Time.deltaTime;
-            yield return 0; // wait one frame to refresh display
-        }
-
-        yield return new WaitForSeconds(1); // wait one second
-        step_end = true;
-        // call again TweenPosition as a coroutine
     }
 
     void Update()
@@ -160,11 +105,9 @@ public class RobotMove : MonoBehaviour
         // ISP 역할
         if (step_end && !reck)
         {
-            distanceforward = 0;
-            distanceright = 0;
+            for (int i = 0; i < 3; i++) distance[i] = 0;
             reck = true;
         }
-        distance[0] = org_pos[0] - transform.position.x;
         Debug.DrawRay(transform.position, transform.forward, Color.red, 100); // 정면 체크(디버그용)
     }
 }
