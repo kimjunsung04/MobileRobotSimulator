@@ -6,9 +6,11 @@ using UnityEngine.UI;
 public class RobotUI : MonoBehaviour
 {
     public Text Target;
-    int CaseNum = 0;
+    public int CaseNum = 0;
 
     public RobotMove MoveClass;
+    public Compiler Compiler;
+    public AutoCodeload AClass;
 
     public void CaseUpOnClick()
     {
@@ -23,7 +25,8 @@ public class RobotUI : MonoBehaviour
 
     public void StartOnClick()
     {
-        StartCoroutine(MoveClass.caserunner(CaseNum));
+        string source = AClass.SourceCodeStr.Replace("{{CaseNum}}", $"{CaseNum}");
+        Compiler.RunCode(source);
     }
     public void ResetOnClick()
     {

@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using System.Threading;
 using Newtonsoft.Json.Linq;
@@ -7,9 +6,7 @@ using Newtonsoft.Json.Linq;
 public class RobotMove : MonoBehaviour
 {
     float[] org_pos = new float[3] { 0, 0, 0 };
-    float[] distance = new float[3] { 0, 0, 0 };
-
-    public string SourceCodeStr; // 소스코드 문자열로
+    public float[] distance = new float[3] { 0, 0, 0 };
 
     bool reck = false; // 리셋체크
     bool step_end = false; // 스텝 끝났는지 체크
@@ -44,7 +41,6 @@ public class RobotMove : MonoBehaviour
 
     public IEnumerator caserunner(int csenum) // 케이스 코루틴 실행함수
     {
-        //SourceCode = JObject.Parse(SourceCodeStr);
         yield return StartCoroutine(caserun(csenum));
     }
 
@@ -84,7 +80,7 @@ public class RobotMove : MonoBehaviour
         org_pos[2] = transform.localEulerAngles.y;
     }
 
-    private IEnumerator H(float vx, float vy, float vw)
+    public IEnumerator H(float vx, float vy, float vw)
     {
         vx = vx / 1000;
         vy = vy / 1000;
