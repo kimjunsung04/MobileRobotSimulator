@@ -104,6 +104,5 @@ public class RobotMove : MonoBehaviour
             for (int i = 0; i < 3; i++) distance[i] = 0;
             reck = true;
         }
-        Debug.DrawRay(transform.position, transform.forward, Color.red, 100); // 정면 체크(디버그용)
     }
 }
