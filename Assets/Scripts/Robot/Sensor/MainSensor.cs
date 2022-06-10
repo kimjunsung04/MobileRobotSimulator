@@ -16,7 +16,7 @@ public class MainSensor : MonoBehaviour
     public LineRenderer p7;
     public LineRenderer p8;
 
-    public static float[] p = new float[9];
+    public static float[] porg = new float[9];
     Color basC; // 기본 색
     Color warC; // 경고 색
     Color danC; // 위험 색
@@ -35,7 +35,7 @@ public class MainSensor : MonoBehaviour
     void Update()
     {
         LineRenderer[] Sensors = { p0, p1, p2, p3, p4, p5, p6, p7, p8 };
-        for (int i = 0; i < 9; i++)
+        for (int i = 0; i < 9; i++) // p센서 실시간 로드
         {
             if (Sensors[i])
             {
@@ -48,21 +48,20 @@ public class MainSensor : MonoBehaviour
                     }
                 }
                 else Sensors[i].SetPosition(1, Sensors[i].transform.forward * 5000);
-                p[i] = hit.distance;
-                Debug.Log($"{i}번센서: {p[i]}");
+                porg[i] = hit.distance;
                 Debug.DrawRay(Sensors[i].transform.position, Sensors[i].transform.forward*hit.distance, Color.red);
             }
         }
-        for (int i = 0; i < 9; i++)
+        for (int i = 0; i < 9; i++) // 시뮬레이터 인터페이스
         {
             Transform pm = PSensorView.transform.GetChild(i);
             RawImage pimg = PSensorView.transform.Find($"p{i}").GetComponent<RawImage>();
             Text ptext = pm.transform.Find($"p{i}Text").GetComponent<Text>();
-            if (p[i] < 0.2f)
+            if (porg[i] < 0.2f)
             {
                 pimg.color = danC;
             }
-            else if(p[i] < 0.6f)
+            else if(porg[i] < 0.6f)
             {
                 pimg.color = warC;
             }
@@ -70,7 +69,12 @@ public class MainSensor : MonoBehaviour
             {
                 pimg.color = basC;
             }
-            ptext.text = $"{p[i]}";
+            ptext.text = $"{porg[i]}";
         }
+    }
+
+    public static float p(int snum)
+    {
+        return porg[snum];
     }
 }

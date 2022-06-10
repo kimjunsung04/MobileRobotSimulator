@@ -6,20 +6,12 @@ public class test2 : MonoBehaviour
 {
     public static RobotMove robot;
     public static float[] distance;
-    public static int CaseNum;
     // Start is called before the first frame update
-
-    public static int AddYourselfTo(int casenum)
-    {
-        CaseNum = casenum;
-        return CaseNum;
-    }
 
     void Start()
     {
-        AddYourselfTo(0);
         robot = GameObject.Find("RobotModel").GetComponent<RobotMove>();
-        StartCoroutine(caserunner(CaseNum));
+        StartCoroutine(caserunner(0));
     }
 
     // Update is called once per frame
@@ -28,7 +20,7 @@ public class test2 : MonoBehaviour
         distance = robot.distance;
     }
 
-    public static IEnumerator StepHandler(string movef, params int[] disl)
+    public static IEnumerator StepHandler(string movef, params float[] disl)
     {
         yield return robot.StartCoroutine(robot.StepHandler(movef, disl));
     }

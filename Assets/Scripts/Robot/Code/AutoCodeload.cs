@@ -11,6 +11,7 @@ public class AutoCodeload : MonoBehaviour
 
     public BaseUI BaseUI;
     public RobotMove RobotMove;
+    public Compiler Compiler;
 
     private const string URL = "http://127.0.0.1:8800/download";
 
@@ -26,6 +27,7 @@ public class AutoCodeload : MonoBehaviour
             if (requestCode == 200)
             {
                 SourceCodeStr = request.downloadHandler.text;
+                Compiler.comck = true;
             }
         }
     }
@@ -40,6 +42,7 @@ public class AutoCodeload : MonoBehaviour
             {
                 BaseUI.PopupShow("알림", "새로운코드 감지됨!", 3);
                 SourceCodeStr = request.downloadHandler.text;
+                Compiler.comck = true;
             }
         }
         requestCode = 0;

@@ -25,8 +25,8 @@ public class RobotUI : MonoBehaviour
 
     public void StartOnClick()
     {
-        string source = AClass.SourceCodeStr.Replace("{{CaseNum}}", $"{CaseNum}");
-        Compiler.RunCode(source);
+        string source = AClass.SourceCodeStr;
+        Compiler.RunCode(source, $"{CaseNum}");
     }
     public void ResetOnClick()
     {
