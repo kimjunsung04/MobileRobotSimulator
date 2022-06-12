@@ -65,7 +65,7 @@ MonoBehaviour:
   - UnityEngine.PhysicsModule.dll
   - UnityEngine.UIModule.dll
   - mscorlib
-  - RoslynCSharp.Examples.dll
+  - Assembly-CSharp
   defineSymbols: []
   allowHotReloading: 1
   hotReloadCopySerializedFields: 1

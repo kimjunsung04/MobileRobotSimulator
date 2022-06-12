@@ -6,7 +6,7 @@ public class RobotMove : MonoBehaviour
 {
     float[] org_pos = new float[3] { 0, 0, 0 };
     public float[] distance = new float[3] { 0, 0, 0 };
-    public static float[] porg = new float[9];
+    private static float[] porg = new float[9];
     public MainSensor MainSensor;
     
     public float f_agl = 0; // 기준각
@@ -132,7 +132,7 @@ public class RobotMove : MonoBehaviour
     }
 
     /*센서영역*/
-    private float p(int snum)
+    public static float p(int snum)
     {
         return porg[snum];
     }
@@ -140,6 +140,7 @@ public class RobotMove : MonoBehaviour
 
     void Update()
     {
+
         // ISP 역할
         if (step_end && !reck)
         {
