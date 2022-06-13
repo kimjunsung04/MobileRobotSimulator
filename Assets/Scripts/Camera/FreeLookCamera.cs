@@ -32,11 +32,12 @@ namespace Rito
 
         [Space]
         public KeyCode _run = KeyCode.LeftShift;
-        public KeyCode _cursorLock = KeyCode.LeftAlt;
 
         [Header("States")]
         public bool _isActivated = true;     // 활성화 플래그
         public bool _isCursorVisible = true;
+
+        private RaycastHit hit;
 
         #endregion
         /***********************************************************************
@@ -73,13 +74,22 @@ namespace Rito
 
             if (!_isActivated) return; // 기능 비활성화 상태에서는 모든 기능 정지
 
-            CursorLock();
             if (_isCursorVisible) return; // 커서 보이는 상태에서는 이동, 회전 X
 
             _deltaTime = Time.deltaTime;
             GetInputs();
             Rotate();
             Move();
+        }
+        void OnTriggerStay(Collider other)
+        {
+            //When colliding, the camera moves up and back from the player object
+
+            if (Physics.Raycast(transform.position, transform.forward, out hit))
+            {
+                Debug.Log("hit point : " + hit.point + ", distance : " + hit.distance + ", name : " + hit.collider.name);
+                Debug.DrawRay(transform.position, transform.forward * hit.distance, Color.red);
+            }
         }
 
         #endregion
@@ -141,17 +151,6 @@ namespace Rito
             float mY = -Input.GetAxisRaw("Mouse Y");
 
             _rotation = new Vector2(mY, mX);
-        }
-
-        private void CursorLock()
-        {
-            if (Input.GetKeyDown(_cursorLock))
-            {
-                _isCursorVisible = !_isCursorVisible;
-
-                Cursor.lockState = !_isCursorVisible ? CursorLockMode.Locked : CursorLockMode.None;
-                Cursor.visible = _isCursorVisible;
-            }
         }
 
         private void Rotate()
