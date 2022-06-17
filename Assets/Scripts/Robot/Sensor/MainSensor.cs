@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -48,7 +49,12 @@ public class MainSensor : MonoBehaviour
                     }
                 }
                 else Sensors[i].SetPosition(1, Sensors[i].transform.forward * 5000);
-                porg[i] = hit.distance;
+                float cashdist = hit.distance * 500-255; // 거리값 조정 핵심
+                if(cashdist >= -30)
+                {
+                    cashdist = -30;
+                }
+                porg[i] = Math.Abs(cashdist);
                 Debug.DrawRay(Sensors[i].transform.position, Sensors[i].transform.forward*hit.distance, Color.red);
             }
         }
@@ -57,11 +63,11 @@ public class MainSensor : MonoBehaviour
             Transform pm = PSensorView.transform.GetChild(i);
             RawImage pimg = PSensorView.transform.Find($"p{i}").GetComponent<RawImage>();
             Text ptext = pm.transform.Find($"p{i}Text").GetComponent<Text>();
-            if (porg[i] < 0.2f)
+            if (porg[i] > 200)
             {
                 pimg.color = danC;
             }
-            else if(porg[i] < 0.6f)
+            else if(porg[i] > 130)
             {
                 pimg.color = warC;
             }

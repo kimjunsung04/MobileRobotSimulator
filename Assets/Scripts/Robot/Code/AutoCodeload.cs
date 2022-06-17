@@ -40,7 +40,7 @@ public class AutoCodeload : MonoBehaviour
             requestCode = request.responseCode;
             if (requestCode == 200 && (SourceCodeStr!=request.downloadHandler.text))
             {
-                BaseUI.PopupShow("알림", "새로운코드 감지됨!", 3);
+                StartCoroutine(BaseUI.PopupShow("알림", "새로운코드 감지됨!", 3));
                 SourceCodeStr = request.downloadHandler.text;
                 Compiler.comck = true;
             }
@@ -55,11 +55,11 @@ public class AutoCodeload : MonoBehaviour
         yield return ServerGet();
         if (requestCode == 200)
         {
-            BaseUI.PopupShow("알림", "서버통신 성공", 3);
+            StartCoroutine(BaseUI.PopupShow("알림", "서버통신 성공", 3));
         }
         else
         {
-            BaseUI.PopupShow("알림", "서버통신 실패", 3);
+            StartCoroutine(BaseUI.PopupShow("알림", "서버통신 실패", 3));
         }
         requestCode = 0;
         yield return CodeGet();

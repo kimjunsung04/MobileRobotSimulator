@@ -23,7 +23,15 @@ public class PreviewObject : MonoBehaviour
     }
     void OnTriggerEnter(Collider other)
     {
-        col.Add(other);
+        if (col.Count >= 0)
+        {
+            col = new List<Collider>();
+            col.Add(other);
+        }
+        else
+        {
+            col.Add(other);
+        }
     }
 
     void OnTriggerExit(Collider other)

@@ -9,6 +9,9 @@ public class RobotUIView : MonoBehaviour
     public Camera getCamera;
     public GameObject Target;
     public GameObject UI;
+    public Material ColorMatrial;
+    public Color startColor;
+    public Color mouseOverColor;
 
     // 레이케스트가 건드린(?) 것을 취득해서 넣어두는곳
     private RaycastHit hit;
@@ -16,22 +19,27 @@ public class RobotUIView : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // 마우스 클릭을 하면~
+
         if (Input.GetMouseButtonDown(0))
         {
-            // 마우스 포지션을 취득해서 대입해
-            Ray ray = getCamera.ScreenPointToRay(Input.mousePosition);
-
-            // 마우스 포지션에서 레이를 던져서 뭔가가 걸리면 hit에 넣음
-            if (Physics.Raycast(ray, out hit))
+            if (Physics.Raycast(getCamera.transform.position, getCamera.transform.forward, out hit, 8))
             {
-                // 오브젝트명을 취득해서 변수에 넣음
-                string objectName = hit.collider.gameObject.name;
-                // 오브젝트명을 콘솔에 표시해줌
-                if (objectName == Target.name)
+                if (hit.collider.gameObject.name == Target.name)
                 {
+                    ColorMatrial.SetColor("_Color", mouseOverColor);
                     UI.SetActive(true);
                 }
+            }
+        }
+        if (Physics.Raycast(getCamera.transform.position, getCamera.transform.forward, out hit, 8))
+        {
+            if (hit.collider.gameObject.name == Target.name)
+            {
+                ColorMatrial.SetColor("_Color", mouseOverColor);
+            }
+            else
+            {
+                ColorMatrial.SetColor("_Color", startColor);
             }
         }
     }

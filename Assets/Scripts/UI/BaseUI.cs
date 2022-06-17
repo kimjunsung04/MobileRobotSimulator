@@ -1,6 +1,8 @@
 using Rito;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,13 +16,16 @@ public class BaseUI : MonoBehaviour
     private float fadeTime = 1f;
     private float accumTime = 0f;
     private Coroutine fadeCor;
+    private static int nowshow; // 현재 보여주고있는 show id
 
-
-    public void PopupShow(string title, string content, float delay)
+    public IEnumerator PopupShow(string title, string content, float delay)
     {
+        nowshow = UnityEngine.Random.Range(10000000, 99999999); // show id 생성
+        int nowcash = nowshow;
         PopContentEdit(title, content);
         StartFadeIn();
-        Invoke("StartFadeOut",5);
+        yield return new WaitForSeconds(5);
+        StartFadeOut(nowcash);
     }
 
     public void PopContentEdit(string title, string content)
@@ -39,8 +44,11 @@ public class BaseUI : MonoBehaviour
         fadeCor = StartCoroutine(FadeIn());
     }
 
-    public void StartFadeOut()
+    public void StartFadeOut(int showid)
     {
+        if(showid != nowshow){ // 아이디 다를시 닫지않음(다른팝업 구분)
+            return;
+        }
         if (fadeCor != null)
         {
             StopAllCoroutines();
