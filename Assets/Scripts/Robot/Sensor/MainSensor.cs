@@ -49,7 +49,7 @@ public class MainSensor : MonoBehaviour
                     }
                 }
                 else Sensors[i].SetPosition(1, Sensors[i].transform.forward * 5000);
-                float cashdist = hit.distance * 500-255; // 거리값 조정 핵심
+                float cashdist = (hit.distance * 200) - 255; // 거리값 조정 핵심
                 if(cashdist >= -30)
                 {
                     cashdist = -30;
