@@ -27,6 +27,10 @@ public class RobotMove : MonoBehaviour
         {
             yield return StartCoroutine(H(disl[0], disl[1], disl[2]));
         }
+        else if (movef == "bwp")
+        {
+            yield return StartCoroutine(bwp(disl[0], disl[1]));
+        }
         else if (movef == "wp")
         {
             yield return StartCoroutine(wp(disl[0], disl[1]));
@@ -83,14 +87,24 @@ public class RobotMove : MonoBehaviour
     {
         float xspd = f_spd;
         float yspd = f_spd;
+        float wspd = f_spd;
         if (xpos != 0) // x값이 마이너스 일때
         {
             if (xpos <= 0) xspd = -f_spd;
         }
 
-        if (ypos != 0) // x값이 마이너스 일때
+        if (ypos != 0) // y값이 마이너스 일때
         {
             if (ypos <= 0) yspd = -f_spd;
+        }
+
+        if (deg != 0) // w값이 마이너스 일때
+        {
+            if (fw_spd != 0)
+            {
+                if (deg <= 0) wspd = -fw_spd;
+            }
+            else if (deg <= 0) wspd = -f_spd;
         }
 
         if (deg != 0 && fw_spd == 0)
@@ -99,6 +113,7 @@ public class RobotMove : MonoBehaviour
         }
         if (xpos == 0) xspd = 0;
         if (ypos == 0) yspd = 0;
+        if (deg == 0) wspd = 0;
         while (true)
         {
             if(ff(xpos, ypos, deg))
@@ -115,7 +130,8 @@ public class RobotMove : MonoBehaviour
             if (distance[0] >= Math.Abs(xpos)) xspd = 0;
             if (distance[1] >= Math.Abs(ypos)) yspd = 0;
             if (distance[2] >= Math.Abs(deg)) fw_spd = 0;
-            StartCoroutine(H(xspd, yspd, fw_spd));
+            if (f_spd == 0) StartCoroutine(H(xspd, yspd, wspd));
+            else StartCoroutine(H(xspd, yspd, fw_spd));
             yield return 0;
         }
         yield return new WaitForSeconds(0.05f);
@@ -133,6 +149,7 @@ public class RobotMove : MonoBehaviour
             v[1] = (float)(Math.Sin(f_agl * Math.PI / 180) * vx + Math.Sin((90 - f_agl) * Math.PI / 180) * vy);
         }
 
+        /* 무빙 처리 */
         transform.Translate((transform.forward * 1) * Time.deltaTime * v[0], Space.World);
         transform.Translate((transform.right * 1) * Time.deltaTime * v[1], Space.World);
         transform.Rotate(new Vector3(0, Time.deltaTime * vw, 0));
@@ -180,6 +197,27 @@ public class RobotMove : MonoBehaviour
         yield return 0;
     }
 
+    public IEnumerator bwp(float mode, float speed)
+    {
+        float[] sen = new float[] { 120, 120 };
+        float err = 0, err2 = 0;
+
+        if (mode == 40)
+        {
+            sen[0] = 150;
+            sen[1] = 150;
+        }
+
+        if (p(3) > sen[0]) err = p(3) - sen[0];
+        else err = 0;
+        if (p(5) > sen[1]) err2 = sen[1] - p(5);
+        else err2 = 0;
+
+        f_agl = 20;
+        StartCoroutine(H(-speed, 2.7f * (err + err2), 0));
+        yield return 0;
+    }
+
     public IEnumerator CC(float dir, float dir2, float mm, float er)
     {
         float val = 0;
@@ -193,36 +231,36 @@ public class RobotMove : MonoBehaviour
             if (dir == 1)
             {
                 err[1] = p(3) - 230;
-                if (mm!=0)
+                if (mm != 0)
                 {
                     err[0] = p((int)dir2) - mm;
                     if (dir2 == 0) err[0] *= -1;
                 }
-                val = 44.5f;
+                val = 38;
                 s[0] = 1;
                 s[1] = 3;
             }
             else if (dir == 8)
             {
                 err[1] = 230 - p(6);
-                if (mm!=0)
+                if (mm != 0)
                 {
                     err[0] = p((int)dir2) - mm;
                     if (dir2 == 0) err[0] *= -1;
                 }
-                val = 44.5f;//30
+                val = 31;//30
                 s[0] = 8;
                 s[1] = 6;
             }
             else if (dir == 5)
             {
                 err[0] = p(4) - 235;
-                if (mm!=0)
+                if (mm != 0)
                 {
                     err[1] = p((int)dir2) - mm;
                     if (dir2 >= 6) err[1] *= -1;
                 }
-                val = 49.5f; //51~54     R(val up) / L(val down)
+                val = 51; //51~54     R(val up) / L(val down)
                 s[0] = 4;
                 s[1] = 5;
             }
