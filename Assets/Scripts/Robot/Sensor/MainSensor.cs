@@ -49,12 +49,42 @@ public class MainSensor : MonoBehaviour
                     }
                 }
                 else Sensors[i].SetPosition(1, Sensors[i].transform.forward * 5000);
-                float cashdist = (hit.distance * 200) - 255; // 거리값 조정 핵심
-                if(cashdist >= -30)
+                float cashdist = (hit.distance * 200) - 255; // 거리값 조정 핵심 
+                if(cashdist >= -30) 
+                { 
+                    cashdist = -30; 
+                } 
+                float discash = hit.distance;
+                int ppval = (int)Math.Abs(cashdist); // p센서 증가값
+                if (ppval <= 250 && ppval >= 227) // 256~200영역
                 {
-                    cashdist = -30;
+                    discash = 200 + (2.434782608695652f * (ppval - 227));
                 }
-                porg[i] = Math.Abs(cashdist);
+                else if (ppval <= 227 && ppval >= 220) // 200~150영역
+                {
+                    discash = 150 + (7.142857142857143f * (ppval - 220));
+                }
+                else if (ppval <= 220 && ppval >= 208) // 150~120영역
+                {
+                    discash = 120 + (2.5f * (ppval - 208));
+                }
+                else if (ppval <= 208 && ppval >= 200) // 120~100영역
+                {
+                    discash = 100 + (2.5f * (ppval - 200));
+                }
+                else if (ppval <= 200 && ppval >= 190) // 100~80영역
+                {
+                    discash = 80 + (2 * (ppval - 190));
+                }
+                else if (ppval <= 190 && ppval >= 163) // 80~60영역
+                {
+                    discash = 60 + (0.7407407407407407f * (ppval - 163));
+                }
+                else
+                {
+                    discash = 30;
+                }
+                porg[i] = discash;
                 Debug.DrawRay(Sensors[i].transform.position, Sensors[i].transform.forward*hit.distance, Color.red);
             }
         }
