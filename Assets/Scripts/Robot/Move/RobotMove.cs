@@ -87,7 +87,7 @@ public class RobotMove : MonoBehaviour
     {
         float xspd = f_spd;
         float yspd = f_spd;
-        float wspd = f_spd;
+        float wspd = fw_spd;
         if (xpos != 0) // x값이 마이너스 일때
         {
             if (xpos <= 0) xspd = -f_spd;
@@ -100,11 +100,7 @@ public class RobotMove : MonoBehaviour
 
         if (deg != 0) // w값이 마이너스 일때
         {
-            if (fw_spd != 0)
-            {
-                if (deg <= 0) wspd = -fw_spd;
-            }
-            else if (deg <= 0) wspd = -f_spd;
+            if (deg <= 0) wspd = -fw_spd;
         }
 
         if (deg != 0 && fw_spd == 0)
@@ -134,7 +130,7 @@ public class RobotMove : MonoBehaviour
             else StartCoroutine(H(xspd, yspd, fw_spd));
             yield return 0;
         }
-        yield return new WaitForSeconds(0.05f);
+        if(stop2==0) yield return new WaitForSeconds(0.05f);
     }
 
     public IEnumerator H(float vx, float vy, float vw)

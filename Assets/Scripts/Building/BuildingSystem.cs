@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public class BuildingSystem : MonoBehaviour
 {
@@ -20,10 +22,14 @@ public class BuildingSystem : MonoBehaviour
     public Material GridTile;
     public Material GridBanTile;
     /* ============  */
-    public BaseUI BaseUI;
+    public BaseUI BaseUI; // 팝업용
+    public RawImage MapSavePopup; // 창 닫기 참조용
 
     public float offset = 1.0f;
     public float gridSize = 1.0f;
+
+    public BuildData BuildData = new BuildData(); // 블럭 설치 데이터
+    public List<GameObject> BuildList = new List<GameObject>();
 
     public bool IsBuilding;
     private bool rmode; // 회전모드
@@ -136,11 +142,20 @@ public class BuildingSystem : MonoBehaviour
         PreviewObject P0 = currentpreview.GetComponent<PreviewObject>();
         if (P0.IsBuildable)
         {
-            GameObject creatobj = Instantiate(currentobject.prefab, currentpos, Quaternion.identity);
-            if (rmode)
+            GameObject creatobj = Instantiate(currentobject.gameobj, currentpos, Quaternion.identity);
+
+            if (rmode) // 회전모드 활성화 라면 회전상태로 생성
             {
                 creatobj.transform.Rotate(0, 90, 0);
             }
+            /* 맵 빌딩 리스트 */
+            BuildList.Add(creatobj);
+
+            BuildData.gameobj.Add(currentobject.name);
+            BuildData.currentpos.Add(currentpos);
+            BuildData.identity.Add(Quaternion.identity);
+            BuildData.rotate.Add(rmode);
+            /* 맵 빌딩 리스트 */
         }
     }
 
@@ -190,22 +205,70 @@ public class BuildingSystem : MonoBehaviour
         {
             if (Input.GetMouseButtonDown(0))
             {
+                int cash_index = BuildList.FindIndex(x => x.Equals(hit.transform.gameObject));
+                Debug.Log(cash_index);
+                /* 배열 선택 제거 */
+                BuildData.gameobj.RemoveAt(cash_index);
+
+                BuildData.currentpos.RemoveAt(cash_index);
+
+                BuildData.identity.RemoveAt(cash_index);
+
+                BuildData.rotate.RemoveAt(cash_index);
+
+                BuildList.RemoveAt(cash_index);
+
+                string str = JsonUtility.ToJson(BuildData);
+                /*  */
+
                 Destroy(hit.transform.gameObject);
             }
         }
     }
 
-    public void ChangeBuild(int num)
+    public void ChangeBuild(int num) // 빌드모드 변경
     {
         Destroy(PreviewObject);
         currentobject = objects[num];
         ChangeCurrentBuilding();
         PreviewObject.SetActive(IsBuilding);
     }
+    
+    public void ClearBuilds() // 모든 블럭 삭제
+    {
+        for(int i=0;i< BuildList.Count; i++)
+        {
+            Destroy(BuildList[i]);
+        }
+        BuildList = new List<GameObject>();
+        BuildData = new BuildData();
+    }
 
     public void ChangeRemoveMode()
     {
         RemoveMode = RemoveMode?false:true;
+    }
+
+    [System.Obsolete]
+    public IEnumerator SaveMap(string name)
+    {
+        WWWForm form = new WWWForm();
+        form.AddField("name", name);
+        form.AddField("data", JsonUtility.ToJson(BuildData));
+
+        UnityWebRequest www = UnityWebRequest.Post("http://127.0.0.1:8800/savemap", form);
+        yield return www.SendWebRequest();
+
+        if(www.downloadHandler.text == "ok")
+        {
+            MapSavePopup.transform.gameObject.SetActive(false);
+            StartCoroutine(BaseUI.PopupShow("맵 저장완료", "성공적으로 맵이 저장되었습니다!", 5));
+        }
+        else
+        {
+            MapSavePopup.transform.gameObject.SetActive(false);
+            StartCoroutine(BaseUI.PopupShow("맵 저장실패", "서버와의 연결상태를 확인 해주세요.", 5));
+        }
     }
 }
 
@@ -214,8 +277,25 @@ public class BuildingSystem : MonoBehaviour
 public class buildObjects
 {
     public string name;
-    public GameObject prefab;
+    public GameObject gameobj;
     public GameObject preview;
     public int gold;
     public float yup;
+}
+
+[System.Serializable]
+public class MapDataFormat
+{
+    public List<string> name;
+    public List<string> time;
+    public List<string> data;
+}
+
+[System.Serializable]
+public class BuildData
+{
+    public List<string> gameobj = new List<string>();
+    public List<Vector3> currentpos = new List<Vector3>();
+    public List<Quaternion> identity = new List<Quaternion>();
+    public List<bool> rotate = new List<bool>();
 }
